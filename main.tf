@@ -47,7 +47,7 @@ resource "aws_internet_gateway" "gw" {
 }
 
 resource "aws_eip" "nat" {
-  vpc      = true
+  domain = "vpc"
 }
 
 resource "aws_nat_gateway" "nat" {
@@ -90,7 +90,7 @@ resource "aws_route_table" "database_route_table" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    blackhole = true
+    blackhole = true #NOT VALID!
   }
 
   tags = {
@@ -158,7 +158,30 @@ resource "aws_instance" "database_instance" {
   subnet_id     = aws_subnet.database_subnets[2].id  # Database subnet in 3rd AZ
 }
 
+resource "aws_s3_bucket" "my_bucket" {
+  bucket = "my-s3-bucket-with-unique-name"
 
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "s3:GetObject",
+      "Resource": "${aws_s3_bucket.my_bucket.arn}/*"
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_s3_bucket_acl" "my_bucket_acl"{
+  bucket = aws_s3_bucket.my_bucket.id
+  acl    = "private"
+}
 
 
 
