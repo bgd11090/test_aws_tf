@@ -1,4 +1,4 @@
-![Diagram](https://github.com/bgd11090/test_aws_tf/blob/main/devopstask.drawio)
+![Diagram](https://github.com/bgd11090/test_aws_tf/blob/main/devopstask.drawio.png)
 
 docker run -d --name localstack -e SERVICES=s3,ec2,alb --restart=unless-stopped -p 4566:4566 localstack/localstack
 
