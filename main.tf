@@ -71,7 +71,12 @@ resource "aws_subnet" "database_subnets" {
   }
 }
 
-
+resource "aws_instance" "example" {
+  count         = 3
+  ami           = "ami-0c7217cdde317cfec"
+  instance_type = "t2.micro"
+  subnet_id     = aws_subnet.frontend_subnets[count.index].id
+}
 
 
 
