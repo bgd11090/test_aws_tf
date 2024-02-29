@@ -71,13 +71,32 @@ resource "aws_subnet" "database_subnets" {
   }
 }
 
+/*
 resource "aws_instance" "example" {
   count         = 3
   ami           = "ami-0c7217cdde317cfec"
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.frontend_subnets[count.index].id
 }
+*/
 
+resource "aws_instance" "frontend_instance" {
+  ami           = "ami-0c7217cdde317cfec"
+  instance_type = "t2.micro"
+  subnet_id     = aws_subnet.frontend_subnets[0].id  # Frontend subnet in 1st AZ
+}
+
+resource "aws_instance" "backend_instance" {
+  ami           = "ami-0c7217cdde317cfec"
+  instance_type = "t2.micro"
+  subnet_id     = aws_subnet.backend_subnets[1].id   # Backend subnet in 2nd AZ
+}
+
+resource "aws_instance" "database_instance" {
+  ami           = "ami-0c7217cdde317cfec"
+  instance_type = "t2.micro"
+  subnet_id     = aws_subnet.database_subnets[2].id  # Database subnet in 3rd AZ
+}
 
 
 
