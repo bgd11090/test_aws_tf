@@ -87,12 +87,10 @@ resource "aws_route_table" "backend_route_table" {
 
 resource "aws_route_table" "database_route_table" {
   vpc_id = aws_vpc.main.id
-
   route {
-    cidr_block = "0.0.0.0/0"
-    blackhole = true #NOT VALID!
+    cidr_block = "192.0.2.0/24"
   }
-
+  
   tags = {
     Name = "Database Route Table"
   }
@@ -159,23 +157,30 @@ resource "aws_instance" "database_instance" {
 }
 
 resource "aws_s3_bucket" "my_bucket" {
+  bucket = "my-s3-bucket-with-unique-name"  
+  acl    = "private"
+}
+
+output "my_bucket_arn" {
+  value = aws_s3_bucket.my_bucket.arn
+}
+
+resource "aws_s3_bucket_policy" "my_bucket_policy" {
   bucket = "my-s3-bucket-with-unique-name"
 
-  policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Action": "s3:GetObject",
-      "Resource": "${aws_s3_bucket.my_bucket.arn}/*"
-    }
-  ]
-}
-POLICY
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        },
+        Action = "s3:GetObject",
+        Resource = "${aws_s3_bucket.my_bucket.arn}/*"
+      }
+    ]
+  })
 }
 
 resource "aws_s3_bucket_acl" "my_bucket_acl"{
